@@ -1,0 +1,180 @@
+
+using System;
+using System.Collections.Generic;
+
+namespace SoftwareFarmManagement
+{
+    // Abstract base class for Project
+    public abstract class Project
+    {
+        public int ProjectId { get; set; }
+        public string ProjectName { get; set; }
+        public decimal Budget { get; set; }
+        public Client AssignedClient { get; set; }
+
+        public Project(int id, string name, decimal budget, Client client)
+        {
+            ProjectId = id;
+            ProjectName = name;
+            Budget = budget;
+            AssignedClient = client;
+        }
+
+        public abstract decimal CalculateInvoice(); // Abstract method
+    }
+
+    // Concrete Project class
+    public class SoftwareProject : Project
+    {
+        public SoftwareProject(int id, string name, decimal budget, Client client) 
+            : base(id, name, budget, client) { }
+
+        public override decimal CalculateInvoice() => Budget * 1.1m; // Add 10% profit margin
+    }
+
+    // Client Class
+    public class Client
+    {
+        public int ClientId { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public List<Project> Projects { get; private set; } = new List<Project>();
+
+        public Client(int id, string name, string email)
+        {
+            ClientId = id;
+            Name = name;
+            Email = email;
+        }
+
+        public void AddProject(Project project) => Projects.Add(project);
+
+        public void RemoveProject(Project project) => Projects.Remove(project);
+    }
+
+    // Employee Class
+    public class Employee
+    {
+        public int EmployeeId { get; set; }
+        public string Name { get; set; }
+        public string Role { get; set; }
+
+        public Employee(int id, string name, string role)
+        {
+            EmployeeId = id;
+            Name = name;
+            Role = role;
+        }
+    }
+
+    // Team Class
+    public class Team
+    {
+        public string TeamName { get; set; }
+        public List<Employee> Members { get; private set; } = new List<Employee>();
+        public Project AssignedProject { get; set; }
+
+        public Team(string name) => TeamName = name;
+
+        public void AddMember(Employee employee) => Members.Add(employee);
+
+        public void RemoveMember(Employee employee) => Members.Remove(employee);
+    }
+
+    // Interface for Report Generation
+    public interface IReport
+    {
+        void GenerateReport();
+    }
+
+    // SoftwareFarm Class
+    public class SoftwareFarm : IReport
+    {
+        private List<Project> projects = new List<Project>();
+        private List<Employee> employees = new List<Employee>();
+        private List<Client> clients = new List<Client>();
+
+        public static decimal Revenue { get; private set; }
+
+        // Add/Remove Projects
+        public void AddProject(Project project) => projects.Add(project);
+
+        public void RemoveProject(Project project) => projects.Remove(project);
+
+        // Employee Management
+        public void AddEmployee(Employee employee) => employees.Add(employee);
+
+        public void EditEmployee(int id, string newName, string newRole)
+        {
+            Employee emp = employees.Find(e => e.EmployeeId == id);
+            if (emp != null)
+            {
+                emp.Name = newName;
+                emp.Role = newRole;
+            }
+        }
+
+        public void RemoveEmployee(Employee employee) => employees.Remove(employee);
+
+        // Client Management
+        public void AddClient(Client client) => clients.Add(client);
+
+        public void RemoveClient(Client client) => clients.Remove(client);
+
+        // Billing
+        public void GenerateInvoice(Project project)
+        {
+            decimal invoice = project.CalculateInvoice();
+            Revenue += invoice;
+            Console.WriteLine($"Invoice for {project.ProjectName}: {invoice:C}");
+        }
+
+        // Report Generation
+        public void GenerateReport()
+        {
+            Console.WriteLine("Software Farm Report:");
+            Console.WriteLine($"Total Revenue: {Revenue:C}");
+            Console.WriteLine($"Active Projects: {projects.Count}");
+            Console.WriteLine($"Employees: {employees.Count}");
+        }
+    }
+
+    // Main Program
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Create Clients
+            Client client1 = new Client(1, "ABC Corp", "abc@corp.com");
+
+            // Create Projects
+            Project project1 = new SoftwareProject(101, "Inventory System", 10000, client1);
+
+            // Assign project to client
+            client1.AddProject(project1);
+
+            // Create Employees
+            Employee emp1 = new Employee(1, "John Doe", "Developer");
+            Employee emp2 = new Employee(2, "Jane Smith", "Tester");
+
+            // Create Team
+            Team team1 = new Team("Alpha");
+            team1.AddMember(emp1);
+            team1.AddMember(emp2);
+            team1.AssignedProject = project1;
+
+            // Manage Software Farm
+            SoftwareFarm farm = new SoftwareFarm();
+            farm.AddClient(client1);
+            farm.AddProject(project1);
+            farm.AddEmployee(emp1);
+            farm.AddEmployee(emp2);
+
+            // Generate Invoice
+            farm.GenerateInvoice(project1);
+
+            // Generate Report
+            farm.GenerateReport();
+        }
+    }
+}
