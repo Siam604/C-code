@@ -154,11 +154,11 @@ namespace SoftwareFarmManagement
             client1.AddProject(project1);
 
             // Create Employees
-            Employee emp1 = new Employee(1, "John Doe", "Developer");
-            Employee emp2 = new Employee(2, "Jane Smith", "Tester");
+            Employee emp1 = new Employee(1, "....  ", "Developer");
+            Employee emp2 = new Employee(2, " ....  ", "Tester");
 
             // Create Team
-            Team team1 = new Team("Alpha");
+            Team team1 = new Team("Code Hunters  ");
             team1.AddMember(emp1);
             team1.AddMember(emp2);
             team1.AssignedProject = project1;
